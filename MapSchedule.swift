@@ -118,10 +118,10 @@ struct MapSchedule {
         let map = Map(name: rotation[(rotationIndex) % rotation.count], availableAt: availableAt, availableTo: availableTo)
         return map
     }
-    func upcomingMaps() -> [Map] {
+    func upcomingMaps(at: Date) -> [Map] {
         var maps: [Map] = []
-        for i in 0...rotation.count {
-            maps.append(determineCurrentMap(at: .now + rotationInterval * Double(i)))
+        for i in 1...rotation.count {
+            maps.append(determineCurrentMap(at: at + rotationInterval * Double(i)))
         }
         return maps
     }

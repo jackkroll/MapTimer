@@ -49,11 +49,11 @@ struct ContentView: View {
             }
             .onAppear(){
                 map = schedule.determineCurrentMap(at: .now)
-                upcoming = schedule.upcomingMaps()
+                upcoming = schedule.upcomingMaps(at:.now)
                 DispatchQueue.main.asyncAfter(deadline: .now() + map!.availableTo.timeIntervalSinceNow) {
                     
                     map = schedule.determineCurrentMap(at: .now)
-                    upcoming = schedule.upcomingMaps()
+                    upcoming = schedule.upcomingMaps(at:.now)
                 }
             }
         }
