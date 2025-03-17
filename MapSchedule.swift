@@ -92,7 +92,8 @@ struct Map {
     }
     
     func percentComplete() -> Double {
-        return (availableTo.timeIntervalSince1970 - Date.now.timeIntervalSince1970)/(availableTo.timeIntervalSince1970-availableAt.timeIntervalSince1970)
+        let complete = (availableTo.timeIntervalSince1970 - Date.now.timeIntervalSince1970)/(availableTo.timeIntervalSince1970-availableAt.timeIntervalSince1970)
+        return complete.truncatingRemainder(dividingBy: 1)
     }
 }
 
@@ -110,17 +111,19 @@ struct MapSchedule {
         
         let availableAt = origin.availableAt.addingTimeInterval(Double(rotationIndex) * rotationInterval)
         let availableTo = availableAt.addingTimeInterval(rotationInterval)
-        print(origin.availableTo.timeIntervalSince1970)
-        print(timeSinceOrigin)
-        print(rotationIndex)
-        print(availableAt.timeIntervalSince1970)
-        print(availableTo.timeIntervalSince1970)
         let map = Map(name: rotation[(rotationIndex) % rotation.count], availableAt: availableAt, availableTo: availableTo)
         return map
     }
-    func upcomingMaps(at: Date) -> [Map] {
+    func upcomingMaps(at: Date, range: ClosedRange<Int>? = nil) -> [Map] {
         var maps: [Map] = []
-        for i in 1...rotation.count {
+        var chosenRange: ClosedRange<Int>
+        if range == nil {
+            chosenRange = 1...rotation.count
+        }
+        else {
+            chosenRange = range!
+        }
+        for i in chosenRange {
             maps.append(determineCurrentMap(at: at + rotationInterval * Double(i)))
         }
         return maps

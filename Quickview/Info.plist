@@ -4,6 +4,15 @@
 <dict>
 	<key>NSExtension</key>
 	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>WKWidgetFamily</key>
+			<array>
+				<string>accessoryCircular</string>
+				<string>accessoryRectangular</string>
+				<string>accessoryInline</string>
+			</array>
+		</dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
