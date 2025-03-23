@@ -21,17 +21,20 @@ struct Map {
     var description: String?
     var availableAt: Date
     var availableTo: Date
+    let mixtapeMode: MixtapeMode?
     
-    init(name: MapName, availableAt: Date, availableTo: Date) {
+    init(name: MapName, availableAt: Date, availableTo: Date, mixtapeMode: MixtapeMode? = nil) {
         self.name = name
         self.availableAt = availableAt
         self.availableTo = availableTo
+        self.mixtapeMode = mixtapeMode
     }
     
-    init(name: MapName, availableAt: Double, availableTo: Double) {
+    init(name: MapName, availableAt: Double, availableTo: Double, mixtapeMode: MixtapeMode? = nil) {
         self.name = name
         self.availableAt = Date.init(timeIntervalSince1970: availableAt)
         self.availableTo = Date.init(timeIntervalSince1970: availableTo)
+        self.mixtapeMode = mixtapeMode
     }
     
     func mapName() -> String {
@@ -97,11 +100,45 @@ struct Map {
     }
 }
 
+enum MixtapeMode {
+    case GunRun, TDM, Control
+}
+
+enum Playlist {
+    case regular,ranked
+}
+
+//origin = Map(name: .KC, availableAt: 1741721400, availableTo: 1741726800)
+//rotation = [.BM ,.KC, .OL]
+
+struct CurrentMapRotation {
+
+    func fetchPlaylist(playlist: Playlist) -> MapSchedule {
+        switch(playlist) {
+        case .regular:
+            return MapSchedule(origin: Map(name: .KC, availableAt: 1741721400, availableTo: 1741726800), rotation: [.BM,.KC,.OL])
+        case .ranked:
+            return MapSchedule(origin: Map(name:.KC, availableAt: 1741716000, availableTo: 1741802400), rotation: [.OL, .SP,.KC])
+        }
+    }
+    func fetchLTM() -> [MapSchedule] {
+        return []
+    }
+}
 
 struct MapSchedule {
-    let origin = Map(name: .KC, availableAt: 1741721400, availableTo: 1741726800)
-    let rotation: [MapName] = [.BM ,.KC, .OL]
-    let rotationInterval: Double = 5400
+    let origin : Map
+    let rotation: [MapName]
+    let takeoverName: String?
+    
+    let rotationInterval: Double
+    
+    init(origin: Map, rotation: [MapName], takeoverName: String? = nil) {
+        self.origin = origin
+        self.rotation = rotation
+        self.takeoverName = takeoverName
+        self.rotationInterval = origin.availableTo.timeIntervalSince1970 - origin.availableAt.timeIntervalSince1970
+    }
     
     func determineCurrentMap(at : Date) -> Map {
         let origin = origin
@@ -130,4 +167,6 @@ struct MapSchedule {
     }
 }
 
-
+struct GameRotation {
+    
+}

@@ -9,7 +9,7 @@ import WidgetKit
 import SwiftUI
 
 struct Provider: AppIntentTimelineProvider {
-    let schedule = MapSchedule()
+    let schedule = CurrentMapRotation().fetchPlaylist(playlist: .regular)
     func placeholder(in context: Context) -> SimpleEntry {
         let map = schedule.determineCurrentMap(at: .now)
         let schedule = schedule.upcomingMaps(at: .now, range: 1...2)
