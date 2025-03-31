@@ -12,7 +12,8 @@ import SwiftUI
 struct QuickviewBundle: WidgetBundle {
     var body: some Widget {
         Quickview()
-        QuickviewControl()
-        QuickviewLiveActivity()
+        Quickview_Ranked()
+        //QuickviewControl()
+        //QuickviewLiveActivity()
     }
 }

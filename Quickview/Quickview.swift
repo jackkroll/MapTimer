@@ -9,23 +9,38 @@ import WidgetKit
 import SwiftUI
 
 struct Provider: AppIntentTimelineProvider {
-    let schedule = CurrentMapRotation().fetchPlaylist(playlist: .regular)
+    @State var playlist: Playlist
+    
     func placeholder(in context: Context) -> SimpleEntry {
-        let map = schedule.determineCurrentMap(at: .now)
-        let schedule = schedule.upcomingMaps(at: .now, range: 1...2)
-        return SimpleEntry(date: Date(), configuration: ConfigurationAppIntent(), map: map, schedule: schedule)
+        //let schedule = CurrentMapRotation().fetchPlaylist(playlist: playlist)
+        //let map = schedule.determineCurrentMap(at: .now)
+        //let upcoming = schedule.upcomingMaps(at: .now, range: 1...2)
+        return SimpleEntry(date: Date(), configuration: ConfigurationAppIntent(), map: Map(name: .KC, availableAt: Date(timeIntervalSinceNow: -300), availableTo: Date(timeIntervalSinceNow: 3000)), schedule: [])
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
+        var schedule: MapSchedule
+        do {
+            schedule = try await CurrentMapRotation().fetchPlaylist(playlist: playlist)
+        }
+        catch {
+            return SimpleEntry(date: .now, configuration: configuration, map: nil, schedule: [])
+        }
         let map = schedule.determineCurrentMap(at: .now)
-        let schedule = schedule.upcomingMaps(at: .now, range: 1...2)
-        return SimpleEntry(date: Date(), configuration: configuration, map: map, schedule: schedule)
+        let upcoming = schedule.upcomingMaps(at: .now, range: 1...2)
+        return SimpleEntry(date: Date(), configuration: configuration, map: map, schedule: upcoming)
     }
     
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         var entries: [SimpleEntry] = []
-
-        
+        var schedule: MapSchedule
+        do {
+            schedule = try await CurrentMapRotation().fetchPlaylist(playlist: playlist)
+        }
+        catch {
+            //issues, fetch again after 15m
+            return Timeline(entries: [], policy: .after(.now + (60 * 15)))
+        }
         for rotation in 0...5 {
             let map = schedule.determineCurrentMap(at: .now + Double(rotation) * schedule.rotationInterval)
             
@@ -204,10 +219,31 @@ struct QuickviewEntryView : View {
 }
 
 struct Quickview: Widget {
-    let kind: String = "Quickview"
+    let kind: String = "Casual Rotation"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider(playlist: .regular)) { entry in
+            QuickviewEntryView(entry: entry)
+                .containerBackground(.fill.secondary, for: .widget)
+        }
+#if os(watchOS)
+        .supportedFamilies([.accessoryCircular,
+                            .accessoryRectangular, .accessoryInline])
+#else
+        .supportedFamilies([.accessoryCircular,
+                            .accessoryRectangular, .accessoryInline,
+                            .systemSmall, .systemMedium, .systemLarge])
+        
+#endif
+        .configurationDisplayName("Casual Rotation")
+    }
+}
+
+struct Quickview_Ranked: Widget {
+    let kind: String = "Ranked Rotation"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider(playlist: .ranked)) { entry in
             QuickviewEntryView(entry: entry)
                 .containerBackground(.fill.secondary, for: .widget)
         }
@@ -219,6 +255,7 @@ struct Quickview: Widget {
                             .accessoryRectangular, .accessoryInline,
                             .systemSmall, .systemMedium, .systemLarge])
 #endif
+        .configurationDisplayName("Ranked Rotation")
     }
 }
 

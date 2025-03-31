@@ -8,20 +8,26 @@
 import Foundation
 import SwiftUI
 
-enum MapName {
+enum MapName : String, Codable {
     case KC, WE, OL, SP, BM, ED
 }
 
-struct Rotation {
+struct Rotation : Codable{
     var maps: [MapName]
 }
 
-struct Map {
+struct Map : Codable {
     var name: MapName
-    var description: String?
     var availableAt: Date
     var availableTo: Date
-    let mixtapeMode: MixtapeMode?
+    var mixtapeMode: MixtapeMode?
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case availableAt
+        case availableTo
+        case mixtapeMode
+    }
     
     init(name: MapName, availableAt: Date, availableTo: Date, mixtapeMode: MixtapeMode? = nil) {
         self.name = name
@@ -29,6 +35,14 @@ struct Map {
         self.availableTo = availableTo
         self.mixtapeMode = mixtapeMode
     }
+    /*
+    init(name: MapName, availableAt: String, availableTo: String, mixtapeMode: MixtapeMode? = nil) {
+        self.name = name
+        self.availableAt = ISO8601DateFormatter().date(from: availableAt) ?? .distantFuture
+        self.availableTo = ISO8601DateFormatter().date(from: availableTo) ?? .distantFuture
+        self.mixtapeMode = mixtapeMode
+    }
+     */
     
     init(name: MapName, availableAt: Double, availableTo: Double, mixtapeMode: MixtapeMode? = nil) {
         self.name = name
@@ -36,6 +50,7 @@ struct Map {
         self.availableTo = Date.init(timeIntervalSince1970: availableTo)
         self.mixtapeMode = mixtapeMode
     }
+
     
     func mapName() -> String {
         switch(name) {
@@ -99,12 +114,22 @@ struct Map {
         return complete.truncatingRemainder(dividingBy: 1)
     }
 }
+/*
+extension Map {
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        name = try values.decode(MapName.self, forKey: .name)
+        availableAt = try values.decode(Date.self, forKey: .availableAt)
+        availableTo = try values.decode(Date.self, forKey: .availableTo)
+        mixtapeMode = try values.decodeIfPresent(MixtapeMode.self, forKey: .mixtapeMode)
+    }
+}*/
 
-enum MixtapeMode {
+enum MixtapeMode : Codable{
     case GunRun, TDM, Control
 }
 
-enum Playlist {
+enum Playlist : Codable {
     case regular,ranked
 }
 
@@ -112,12 +137,41 @@ enum Playlist {
 //rotation = [.BM ,.KC, .OL]
 
 struct CurrentMapRotation {
+    
+    func fetchWebSchedule(playlist: Playlist) async throws -> MapSchedule? {
+        do {
+            var url : URL
+            if playlist == .regular {
+                url = URL(string: "https://map.jackk.dev/pubs/schedule")!
+            }
+            else {
+                url = URL(string: "https://map.jackk.dev/ranked/schedule")!
+            }
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let response = try decoder.decode(MapSchedule.self, from: data)
+            return response
+        }
+        catch {
+            return nil
+        }
 
-    func fetchPlaylist(playlist: Playlist) -> MapSchedule {
+    }
+    
+    func fetchPlaylist(playlist: Playlist) async throws -> MapSchedule {
         switch(playlist) {
         case .regular:
+            let response = try await fetchWebSchedule(playlist: .regular)
+            if response != nil {
+                return response!
+            }
             return MapSchedule(origin: Map(name: .KC, availableAt: 1741721400, availableTo: 1741726800), rotation: [.BM,.KC,.OL])
         case .ranked:
+            let response = try await fetchWebSchedule(playlist: .ranked)
+            if response != nil {
+                return response!
+            }
             return MapSchedule(origin: Map(name:.KC, availableAt: 1741716000, availableTo: 1741802400), rotation: [.OL, .SP,.KC])
         }
     }
@@ -126,7 +180,7 @@ struct CurrentMapRotation {
     }
 }
 
-struct MapSchedule {
+struct MapSchedule : Codable {
     let origin : Map
     let rotation: [MapName]
     let takeoverName: String?
@@ -166,6 +220,7 @@ struct MapSchedule {
         return maps
     }
 }
+
 
 struct GameRotation {
     

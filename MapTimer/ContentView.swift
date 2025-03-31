@@ -8,28 +8,54 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var positionID :Int? = 0
-    @State private var scrollOffset : CGPoint = .zero
-    @State private var schedule = CurrentMapRotation()
+    @State private var pubsSchedule : MapSchedule? = nil
+    @State private var rankedSchedule : MapSchedule? = nil
+    @State private var LTMSchedule: MapSchedule?  = nil
+    private var schedule = CurrentMapRotation()
     var body: some View {
         GeometryReader { geo in
             VStack{
                 TabView{
                     Tab("Casual", systemImage: "gamecontroller.fill") {
                         VStack {
-                            MapScheduleView(schedule: schedule.fetchPlaylist(playlist: .regular))
+                            if pubsSchedule != nil {
+                                MapScheduleView(schedule: pubsSchedule!)
+                            }
+                            else {
+                                ProgressView()
+                            }
                         }
-                    }
-                    if (!schedule.fetchLTM().isEmpty) {
-                        Tab("LTM", systemImage: "arcade.stick") {
-                            VStack{
-                                Text("yeah")
+                        .onAppear{
+                            Task {
+                                pubsSchedule = try await schedule.fetchPlaylist(playlist: .regular)
                             }
                         }
                     }
+                    Tab("LTM", systemImage: "arcade.stick") {
+                        VStack {
+                            if LTMSchedule != nil {
+                                MapScheduleView(schedule: rankedSchedule!)
+                            }
+                            else {
+                                ProgressView()
+                            }
+                        }
+                        .onAppear{
+                        }
+                    }
                     Tab("Ranked", systemImage: "bolt.fill") {
-                        VStack{
-                            MapScheduleView(schedule: schedule.fetchPlaylist(playlist: .ranked))
+                        VStack {
+                            if rankedSchedule != nil {
+                                MapScheduleView(schedule: rankedSchedule!)
+                            }
+                            else {
+                                ProgressView()
+                            }
+                        }
+                        .onAppear{
+                            Task {
+                                rankedSchedule = try await schedule.fetchPlaylist(playlist: .ranked)
+                            }
                         }
                     }
                 }
@@ -41,49 +67,30 @@ struct ContentView: View {
 struct MapScheduleView: View {
     @Environment(\.colorScheme) var colorScheme
     @State var schedule : MapSchedule
-    @State var map: Map? = nil
+    //@State var map: Map? = nil
     
     var body : some View {
         GeometryReader { geo in
             
             VStack {
-                VStack {
-                    Text(map?.mapName() ?? "Unknown Map")
-                    Text(map?.availableTo ?? .now, style: .timer)
-                }
-                .foregroundStyle(colorScheme == .dark ? .black : .white)
-                .fontWeight(.semibold)
-                .font(.largeTitle)
-                .fontDesign(map?.fontStyle())
-                .onAppear() {
-                    map = schedule.determineCurrentMap(at: .now)
-                }
-                .padding()
-                .frame(width: geo.size.width * 0.9, height: geo.size.height * 0.55)
-                .background{
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(map?.mapColorTX().gradient ?? Color.gray.gradient)
-                        
-                }
-                
-                Divider().frame(width: geo.size.width * 0.9)
-                ForEach(schedule.upcomingMaps(at: .now, range: 1...schedule.rotation.count), id: \.availableTo) { map in
+                ForEach(schedule.upcomingMaps(at: .now, range: 0...(UIDevice.current.orientation.isLandscape ? 2 : schedule.rotation.count)), id: \.availableTo) { map in
                     RoundedRectangle(cornerRadius: 20)
                         .fill(map.mapColorTX().gradient)
-                        .padding(.horizontal,20)
                         .overlay{
                             VStack{
-                                Text(map.mapName())
-                                Text(map.availableTo, style: schedule.rotationInterval > 43200 ? .date : .time)
+                                Text(map.mapName()) + Text((map.availableAt...map.availableTo).contains(.now) ? schedule.rotationInterval > 43200 ? " until" : "" : schedule.rotationInterval > 43200 ? " on" : " at")
+                                Text(map.availableAt, style: schedule.rotationInterval > 43200 ? .date : (map.availableAt...map.availableTo).contains(.now) ? .timer : .time)
                             }
                             .foregroundStyle(colorScheme == .dark ? .black : .white)
                             .fontWeight(.semibold)
-                            .font(.title2)
+                            .font((map.availableAt...map.availableTo).contains(.now) ? .largeTitle : .title2)
                             .fontDesign(map.fontStyle())
                         }
+                        .padding(5)
+                        .frame(height: (map.availableAt...map.availableTo).contains(.now) ? geo.size.height * 0.5 : nil)
                 }
             }
-            .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
+            .padding(20)
         }
         
     }
