@@ -10,6 +10,24 @@ import SwiftUI
 
 enum MapName : String, Codable {
     case KC, WE, OL, SP, BM, ED
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+            case .KC:
+                try container.encode("KC")
+            case .WE:
+                try container.encode("WE")
+            case .OL:
+                try container.encode("OL")
+            case .SP:
+                try container.encode("SP")
+            case .BM:
+                try container.encode("BM")
+            case .ED:
+                try container.encode("ED")
+            }
+    }
 }
 
 struct Rotation : Codable{
@@ -114,6 +132,19 @@ struct Map : Codable {
         return complete.truncatingRemainder(dividingBy: 1)
     }
 }
+extension Map{
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        //try container.encode(availableAt.timeIntervalSince1970, forKey: .availableAt)
+        //try container.encode(availableTo.timeIntervalSince1970, forKey: .availableTo)
+        try container.encode(availableAt, forKey: .availableAt)
+        try container.encode(availableTo, forKey: .availableTo)
+        if (mixtapeMode != nil) {
+            try container.encode(mixtapeMode, forKey: .mixtapeMode)
+        }
+    }
+}
 /*
 extension Map {
     init(from decoder: Decoder) throws {
@@ -160,18 +191,43 @@ struct CurrentMapRotation {
     }
     
     func fetchPlaylist(playlist: Playlist) async throws -> MapSchedule {
-        switch(playlist) {
-        case .regular:
-            let response = try await fetchWebSchedule(playlist: .regular)
-            if response != nil {
-                return response!
+        @AppStorage("accuracy") var accurate : Bool = false
+        @AppStorage("accuracyDate") var accuracyDate : Date = .distantPast
+        let key = playlist == .regular ? "pubs" : "ranked"
+        let data = UserDefaults.standard.data(forKey: key)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        var schedule : MapSchedule? = nil
+        if data != nil {
+            //reading from user defaults
+            accurate = true
+            schedule = try decoder.decode(MapSchedule.self, from: data!)
+            //data last updated less than a week ago, would be good to have a "best buy" date or check for build hash?
+            if accuracyDate.timeIntervalSinceNow < 604800 {
+                return schedule!
             }
+        }
+        //attempt web request
+        let response = try await fetchWebSchedule(playlist: playlist)
+        if response != nil {
+            //write updated web info!
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(response)
+            UserDefaults.standard.set(data, forKey: key)
+            accurate = true
+            accuracyDate = .now
+            return response!
+        }
+        //wanted to refresh data, but was unable, use possibly stale data
+        if schedule != nil {
+            return schedule!
+        }
+        //all else, return hardcoded result :(
+        accurate = false
+        if (playlist == .regular) {
             return MapSchedule(origin: Map(name: .KC, availableAt: 1741721400, availableTo: 1741726800), rotation: [.BM,.KC,.OL])
-        case .ranked:
-            let response = try await fetchWebSchedule(playlist: .ranked)
-            if response != nil {
-                return response!
-            }
+        }
+        else {
             return MapSchedule(origin: Map(name:.KC, availableAt: 1741716000, availableTo: 1741802400), rotation: [.OL, .SP,.KC])
         }
     }
