@@ -23,7 +23,6 @@ struct ContentView: View {
                         HStack{
                             Image(systemName: "exclamationmark.triangle.fill")
                             Text("Schedule may be outdated")
-                                
                         }
                         .foregroundStyle(.orange)
                         .fontWeight(.semibold)
@@ -106,22 +105,57 @@ struct MapScheduleView: View {
                     RoundedRectangle(cornerRadius: 20)
                         .fill(map.mapColorTX().gradient)
                         .overlay{
-                            VStack{
-                                Text(map.mapName()) + Text((map.availableAt...map.availableTo).contains(.now) ? schedule.rotationInterval > 43200 ? " until" : "" : schedule.rotationInterval > 43200 ? " on" : " at")
-                                Text(map.availableAt, style: schedule.rotationInterval > 43200 ? .date : (map.availableAt...map.availableTo).contains(.now) ? .timer : .time)
+                            ZStack{
+                                MapCard(map: map)
+                                NotificationBell(map: map)
                             }
-                            .foregroundStyle(colorScheme == .dark ? .black : .white)
-                            .fontWeight(.semibold)
-                            .font((map.availableAt...map.availableTo).contains(.now) ? .largeTitle : .title2)
-                            .fontDesign(map.fontStyle())
+                            
                         }
+                        .frame(height: map.isAvailable(at: .now) ? geo.size.height * 0.5 : nil)
                         .padding(5)
-                        .frame(height: (map.availableAt...map.availableTo).contains(.now) ? geo.size.height * 0.5 : nil)
                 }
             }
-            .padding(20)
         }
+    }
+}
+
+struct MapCard : View {
+    @State var map : Map
+    @Environment(\.colorScheme) var colorScheme
+    var body: some View {
+        VStack{
+            Text(map.headerText())
+            map.timerText()
+        }
+        .padding()
+        .multilineTextAlignment(.center)
+        .foregroundStyle(colorScheme == .dark ? .black : .white)
+        .fontWeight(.semibold)
+        .font((map.availableAt...map.availableTo).contains(.now) ? .largeTitle : .title2)
+        .fontDesign(map.fontStyle())
         
+    }
+}
+
+struct NotificationBell : View {
+    @State var map : Map
+    @Environment(\.colorScheme) var colorScheme
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Image(systemName: "bell.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25, height: 25)
+                    .foregroundStyle(.background.tertiary)
+                    .onTapGesture {
+                        addNotification(time: 10, title: "Test Notification", subtitle: "hey?", body: "yooo!")
+                    }
+            }
+            Spacer()
+        }
+        .padding()
     }
 }
 

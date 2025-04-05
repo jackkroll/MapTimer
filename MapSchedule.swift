@@ -116,7 +116,7 @@ struct Map : Codable {
     }
     
     func isAvailable(at date: Date) -> Bool {
-        return availableAt...availableTo ~= date
+        return (availableAt...availableTo).contains(date)
     }
     
     func timeUntilAvailable(at date: Date) -> TimeInterval {
@@ -130,6 +130,32 @@ struct Map : Codable {
     func percentComplete() -> Double {
         let complete = (availableTo.timeIntervalSince1970 - Date.now.timeIntervalSince1970)/(availableTo.timeIntervalSince1970-availableAt.timeIntervalSince1970)
         return complete.truncatingRemainder(dividingBy: 1)
+    }
+    
+    func rotationInterval() -> TimeInterval {
+        return availableAt.distance(to: availableTo)
+    }
+    
+    func headerText() -> String {
+        //map rotation is short term, use time
+        if (rotationInterval() < 43200) {
+            return "\(mapName())" + (isAvailable(at: .now) ? "": " at ")
+        }
+        //map rotation is long term, use date
+        else {
+            return "\(mapName())" + (isAvailable(at: .now) ? " until ": " on ")
+        }
+    }
+    
+    func timerText() -> Text {
+        //map rotation is short term, use time
+        if (rotationInterval() < 43200) {
+            return Text(isAvailable(at: .now) ? availableTo : availableAt, style: isAvailable(at: .now) ? .timer : .time)
+        }
+        //map rotation is long term, use date (usually ranked or season starts)
+        else {
+            return Text(isAvailable(at: .now) ? availableTo : availableAt, style: isAvailable(at: .now) ? .time : .date)
+        }
     }
 }
 extension Map{
@@ -190,36 +216,54 @@ struct CurrentMapRotation {
 
     }
     
+    func fetchHash() async -> String? {
+        let url = URL(string: "https://map.jackk.dev/hash")!
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return String(data: data, encoding: .utf8)!
+        }
+        catch {
+            return nil
+        }
+    }
+    
     func fetchPlaylist(playlist: Playlist) async throws -> MapSchedule {
         @AppStorage("accuracy") var accurate : Bool = false
-        @AppStorage("accuracyDate") var accuracyDate : Date = .distantPast
+        @AppStorage("hash") var hash : String = ""
         let key = playlist == .regular ? "pubs" : "ranked"
         let data = UserDefaults.standard.data(forKey: key)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
         var schedule : MapSchedule? = nil
+        
+        let websiteHash = await fetchHash()
+        
         if data != nil {
             //reading from user defaults
-            accurate = true
             schedule = try decoder.decode(MapSchedule.self, from: data!)
-            //data last updated less than a week ago, would be good to have a "best buy" date or check for build hash?
-            if accuracyDate.timeIntervalSinceNow < 604800 {
+            //current data is accurate!
+            if websiteHash != nil && websiteHash! == hash {
+                accurate = true
                 return schedule!
             }
         }
-        //attempt web request
+        //attempt web request if data is not accurate
         let response = try await fetchWebSchedule(playlist: playlist)
         if response != nil {
             //write updated web info!
             let encoder = JSONEncoder()
             let data = try encoder.encode(response)
             UserDefaults.standard.set(data, forKey: key)
+            if websiteHash != nil {
+                hash = websiteHash!
+            }
             accurate = true
-            accuracyDate = .now
             return response!
         }
         //wanted to refresh data, but was unable, use possibly stale data
         if schedule != nil {
+            accurate = false
             return schedule!
         }
         //all else, return hardcoded result :(
