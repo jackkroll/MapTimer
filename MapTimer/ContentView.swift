@@ -10,8 +10,9 @@ import SwiftUI
 struct ContentView: View {
     @State private var pubsSchedule : MapSchedule? = nil
     @State private var rankedSchedule : MapSchedule? = nil
-    @State private var LTMSchedule: MapSchedule?  = nil
+    @State private var LTMSchedule: [MapSchedule]  = []
     @AppStorage("accuracy") var accurate : Bool = false
+    @State var displayInaccurate: Bool = false
     private var schedule = CurrentMapRotation()
     var body: some View {
         GeometryReader { geo in
@@ -27,7 +28,24 @@ struct ContentView: View {
                         .foregroundStyle(.orange)
                         .fontWeight(.semibold)
                     }
+                    .onTapGesture {
+                        displayInaccurate = true
+                    }
                     .frame(width: geo.size.width * 0.75, height: 30)
+                    .sheet(isPresented: $displayInaccurate) {
+                        VStack {
+                            VStack{
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                Text("Schedule may be outdated")
+                            }
+                            .font(.title)
+                            .foregroundStyle(.orange)
+                            .fontWeight(.semibold)
+                            Text("The application was unable to make a connection to the server, this may be due to a network issue or a server outage.\nIf this issue persists, please contact me at support@jackk.dev")
+                        }
+                        .padding()
+                        .presentationDetents([.fraction(0.3)])
+                    }
                 }
                 TabView{
                     Tab("Casual", systemImage: "gamecontroller.fill") {
@@ -46,17 +64,10 @@ struct ContentView: View {
                             }
                         }
                     }
-                    if(LTMSchedule != nil) {
-                        Tab("LTM", systemImage: "arcade.stick") {
-                            VStack {
-                                if LTMSchedule != nil {
-                                    MapScheduleView(schedule: rankedSchedule!)
-                                }
-                                else {
-                                    ProgressView()
-                                }
-                            }
-                            .onAppear{
+                    if(LTMSchedule.count > 0) {
+                        ForEach(LTMSchedule, id: \.takeoverName) { ltm in
+                            Tab(ltm.takeoverName ?? "LTM", systemImage: ltm.takeoverSystemImage ?? "clock.badge") {
+                                MapScheduleView(schedule: ltm)
                             }
                         }
                     }
@@ -75,6 +86,37 @@ struct ContentView: View {
                             }
                         }
                     }
+                    Tab("About", systemImage: "info.circle") {
+                        VStack {
+                            ScrollView{
+                                VStack(alignment: .leading) {
+                                    Text("Disclaimer")
+                                        .font(.title2)
+                                        .fontWeight(.semibold)
+                                    Text("The project and people involved are not sponsored, affiliated or endorsed by EA/Respawn/EAC in any way. This is made by a player, for players. All images, icons and trademarks belong to their respective owner. Apex Legends is a registered trademark of EA. Game assets, materials and icons belong to Electronic Arts. Be aware, EA and Respawn do not endorse the content of this website nor are responsible for this content.")
+                                }
+                                Divider()
+                                VStack(alignment: .leading) {
+                                    Text("Experiencing Issues?")
+                                        .font(.title2)
+                                        .fontWeight(.semibold)
+                                    Text("This project relys upon my server being up to date, due to this there may be some delay after a update. However, please reach out to me if there are prolonged issues or you encounter other issues")
+                                    Button("Report Issue") {
+                                        UIApplication.shared.open(URL(string: "mailto:support@jackk.dev?subject=Map%20Timer%20Issue")!)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .controlSize(.large)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            //see if ltms exist
+            .onAppear{
+                Task {
+                    LTMSchedule = await schedule.fetchLTMS()
                 }
             }
         }
@@ -199,7 +241,7 @@ struct NotificationSheet : View {
                         addNotification(time: Date.now.distance(to: map.availableAt), title: "\(map.mapName()) is now available!", subtitle: "Avilable for the next \(Int(map.rotationInterval()/60)) minutes", body: "")
                     }
                     if (notifyMeBefore) {
-                        addNotification(time: Date.now.distance(to: map.availableAt) - Double(notifyBeforeTime * 60), title: "\(map.mapName()) will be available in \(notifyBeforeTime)) minutes", subtitle: "Avilable for \(Int(map.rotationInterval()/60)) minutes", body: "")
+                        addNotification(time: Date.now.distance(to: map.availableAt) - Double(notifyBeforeTime * 60), title: "\(map.mapName()) will be available in \(notifyBeforeTime)) minutes", subtitle: "", body: "")
                     }
                 }
                 .fontWeight(.semibold)

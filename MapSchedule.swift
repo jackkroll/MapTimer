@@ -228,6 +228,21 @@ struct CurrentMapRotation {
         }
     }
     
+    func fetchLTMS() async -> [MapSchedule] {
+        do {
+            let url = URL(string: "https://map.jackk.dev/ltm/schedule")!
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let response = try decoder.decode([MapSchedule].self, from: data)
+            return response
+        }
+        catch {
+            print(error)
+            return []
+        }
+    }
+    
     func fetchPlaylist(playlist: Playlist) async throws -> MapSchedule {
         @AppStorage("accuracy") var accurate : Bool = false
         @AppStorage("hash") var hash : String = ""
@@ -275,23 +290,27 @@ struct CurrentMapRotation {
             return MapSchedule(origin: Map(name:.KC, availableAt: 1741716000, availableTo: 1741802400), rotation: [.OL, .SP,.KC])
         }
     }
-    func fetchLTM() -> [MapSchedule] {
-        return []
-    }
 }
 
 struct MapSchedule : Codable {
     let origin : Map
     let rotation: [MapName]
     let takeoverName: String?
+    let takeoverSystemImage: String?
     
     let rotationInterval: Double
     
-    init(origin: Map, rotation: [MapName], takeoverName: String? = nil) {
+    init(origin: Map, rotation: [MapName], takeoverName: String? = nil, takeoverSystemImage: String? = nil, rotationInterval: Double? = nil) {
         self.origin = origin
         self.rotation = rotation
         self.takeoverName = takeoverName
-        self.rotationInterval = origin.availableTo.timeIntervalSince1970 - origin.availableAt.timeIntervalSince1970
+        self.takeoverSystemImage = takeoverSystemImage
+        if rotationInterval ==  nil {
+            self.rotationInterval = origin.availableTo.timeIntervalSince1970 - origin.availableAt.timeIntervalSince1970
+        }
+        else {
+            self.rotationInterval = rotationInterval!
+        }
     }
     
     func determineCurrentMap(at : Date) -> Map {
@@ -319,9 +338,4 @@ struct MapSchedule : Codable {
         }
         return maps
     }
-}
-
-
-struct GameRotation {
-    
 }
