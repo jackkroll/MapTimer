@@ -34,6 +34,7 @@ struct ContentView: View {
                         VStack {
                             if pubsSchedule != nil {
                                 MapScheduleView(schedule: pubsSchedule!)
+                                
                             }
                             else {
                                 ProgressView()
@@ -81,6 +82,7 @@ struct ContentView: View {
 }
 
 struct MapScheduleView: View {
+    @Environment(\.scenePhase) var scenePhase
     @Environment(\.colorScheme) var colorScheme
     @State var schedule : MapSchedule
     //@State var map: Map? = nil
@@ -107,7 +109,9 @@ struct MapScheduleView: View {
                         .overlay{
                             ZStack{
                                 MapCard(map: map)
-                                NotificationBell(map: map)
+                                if !(map.isAvailable(at: .now)) {
+                                    NotificationBell(map: map)
+                                }
                             }
                             
                         }
@@ -140,6 +144,7 @@ struct MapCard : View {
 struct NotificationBell : View {
     @State var map : Map
     @Environment(\.colorScheme) var colorScheme
+    @State var toggleSheet = false
     var body: some View {
         VStack {
             HStack {
@@ -150,14 +155,79 @@ struct NotificationBell : View {
                     .frame(width: 25, height: 25)
                     .foregroundStyle(.background.tertiary)
                     .onTapGesture {
-                        addNotification(time: 10, title: "Test Notification", subtitle: "hey?", body: "yooo!")
+                        toggleSheet = true
                     }
             }
             Spacer()
         }
         .padding()
+        .sheet(isPresented: $toggleSheet) {
+            NotificationSheet(map: map)
+                .presentationDetents([.fraction(0.4)])
+        }
     }
 }
+
+struct NotificationSheet : View {
+    @Environment(\.dismiss) private var dismiss
+    @State var map : Map
+    @State var notifyMeBefore : Bool = false
+    @State var notifyBeforeTime : Double = 10
+    @State var notifyMeUponChange : Bool = true
+    var body: some View {
+        ZStack {
+            VStack (spacing: 20){
+                Text("One Time Notification")
+                    .fontWeight(.semibold)
+                    .font(.largeTitle)
+                    .padding(.top, 20)
+                Toggle(notifyMeBefore ? "Notify me \(Int(notifyBeforeTime)) \(notifyBeforeTime == 1 ? "minute" :"minutes") before" :"Notify me before", isOn: $notifyMeBefore.animation())
+                if (notifyMeBefore) {
+                    Slider(value: $notifyBeforeTime,
+                           in: 1...30,
+                           step: 1,
+                           minimumValueLabel: Text("1 min"),
+                           maximumValueLabel: Text("30 min"),
+                           label: { Text("Minutes before") }
+                    )
+                }
+                
+                Toggle("Notify me when \(map.mapName()) is available", isOn: $notifyMeUponChange)
+                
+                Button("Enable a one time notification") {
+                    if (notifyMeUponChange) {
+                        addNotification(time: Date.now.distance(to: map.availableAt), title: "\(map.mapName()) is now available!", subtitle: "Avilable for the next \(Int(map.rotationInterval()/60)) minutes", body: "")
+                    }
+                    if (notifyMeBefore) {
+                        addNotification(time: Date.now.distance(to: map.availableAt) - Double(notifyBeforeTime * 60), title: "\(map.mapName()) will be available in \(notifyBeforeTime)) minutes", subtitle: "Avilable for \(Int(map.rotationInterval()/60)) minutes", body: "")
+                    }
+                }
+                .fontWeight(.semibold)
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .disabled((!notifyMeBefore && !notifyMeUponChange) || map.isAvailable(at: .now))
+            }
+            .padding(20)
+            
+            VStack {
+                HStack {
+                    Spacer()
+                    Image(systemName: "xmark.circle.fill")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                        .padding()
+                        .symbolRenderingMode(.hierarchical)
+                        .onTapGesture {
+                            dismiss()
+                        }
+                        
+                }
+                Spacer()
+            }
+        }
+    }
+}
+
 
 #Preview {
     ContentView()
