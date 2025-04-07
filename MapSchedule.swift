@@ -162,10 +162,10 @@ extension Map{
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
-        //try container.encode(availableAt.timeIntervalSince1970, forKey: .availableAt)
-        //try container.encode(availableTo.timeIntervalSince1970, forKey: .availableTo)
-        try container.encode(availableAt, forKey: .availableAt)
-        try container.encode(availableTo, forKey: .availableTo)
+        try container.encode(availableAt.timeIntervalSince1970, forKey: .availableAt)
+        try container.encode(availableTo.timeIntervalSince1970, forKey: .availableTo)
+        //try container.encode(availableAt, forKey: .availableAt)
+        //try container.encode(availableTo, forKey: .availableTo)
         if (mixtapeMode != nil) {
             try container.encode(mixtapeMode, forKey: .mixtapeMode)
         }
@@ -271,7 +271,11 @@ struct CurrentMapRotation {
             let data = try encoder.encode(response)
             UserDefaults.standard.set(data, forKey: key)
             if websiteHash != nil {
+                print("updated hash: \(websiteHash!)")
                 hash = websiteHash!
+            }
+            else {
+                print("eroor updating hash")
             }
             accurate = true
             return response!
