@@ -98,19 +98,21 @@ struct Quickview_Large : View {
         GeometryReader { geo in
             VStack {
                 Quickview_Small(entry: entry)
-                    .frame(height: geo.size.height * 0.5)
-                ForEach(entry.schedule, id: \.availableAt){ map in
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundStyle(map.mapColorTX().gradient)
-                        .overlay {
-                            HStack {
-                                Text(map.mapName()) + Text(" at ") + Text(map.availableAt, style: .time)
+                    .frame(height: geo.size.height * (entry.configuration.displayFuture ? 0.5 : 1))
+                if (entry.configuration.displayFuture) {
+                    ForEach(entry.schedule, id: \.availableAt){ map in
+                        RoundedRectangle(cornerRadius: 15)
+                            .foregroundStyle(map.mapColorTX().gradient)
+                            .overlay {
+                                HStack {
+                                    Text(map.mapName()) + Text(" at ") + Text(map.availableAt, style: .time)
+                                }
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(colorScheme == .light ? .white : .black)
+                                .fontWeight(.semibold)
+                                .fontDesign(map.fontStyle())
                             }
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(colorScheme == .light ? .white : .black)
-                            .fontWeight(.semibold)
-                            .fontDesign(map.fontStyle())
-                        }
+                    }
                 }
             }
         }
@@ -190,21 +192,24 @@ struct QuickviewEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
+        /*
         if family == .accessoryCircular {
             Quickview_AccessoryCircular(entry: entry)
-        }
+        } */
         if family == .accessoryInline {
             Quickview_AccessoryInline(entry: entry)
         }
-        
+        /*
         if family == .accessoryRectangular {
             Quickview_AccessoryRectangular(entry: entry)
-        }
+        } */
         
         if family == .systemMedium {
             HStack {
                 Quickview_Small(entry: entry)
-                Futureview_Small(entry: entry)
+                if (entry.configuration.displayFuture) {
+                    Futureview_Small(entry: entry)
+                }
             }
         }
         
