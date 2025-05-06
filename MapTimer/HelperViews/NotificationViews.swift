@@ -66,7 +66,7 @@ struct NotificationSheet : View {
                         addNotification(time: Date.now.distance(to: map.availableAt), title: "\(map.mapName()) is now available!", subtitle: "Avilable for the next \(Int(map.rotationInterval()/60)) minutes", body: "")
                     }
                     if (notifyMeBefore) {
-                        addNotification(time: (Date.now.distance(to: map.availableAt) - Double(notifyBeforeTime * 60)), title: "\(map.mapName()) will be available in \(notifyBeforeTime)) minutes", subtitle: "", body: "")
+                        addNotification(time: (Date.now.distance(to: map.availableAt) - Double(notifyBeforeTime * 60)), title: "\(map.mapName()) will be available in \(notifyBeforeTime) minutes", subtitle: "", body: "")
                     }
                     dismiss()
                 }

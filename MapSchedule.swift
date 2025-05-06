@@ -202,6 +202,7 @@ struct CurrentMapRotation {
                 url = URL(string: "https://map.jackk.dev/pubs/schedule")!
             }
             else {
+                print("Fetching web schedule for ranked")
                 url = URL(string: "https://map.jackk.dev/ranked/schedule")!
             }
             let (data, _) = try await URLSession.shared.data(from: url)
@@ -243,7 +244,14 @@ struct CurrentMapRotation {
         }
     }
     
-    func fetchPlaylist(playlist: Playlist) async throws -> MapSchedule {
+    func shouldUpdate() async -> Bool {
+        @AppStorage("hash") var hash : String = ""
+        let websiteHash = await fetchHash()
+        
+        return websiteHash != nil && websiteHash! != hash
+    }
+    
+    func fetchPlaylist(playlist: Playlist, forceUpdate: Bool = false) async throws -> MapSchedule {
         @AppStorage("accuracy") var accurate : Bool = false
         @AppStorage("hash") var hash : String = ""
         let key = playlist == .regular ? "pubs" : "ranked"
@@ -258,7 +266,7 @@ struct CurrentMapRotation {
             //reading from user defaults
             schedule = try decoder.decode(MapSchedule.self, from: data!)
             //current data is accurate!
-            if websiteHash != nil && websiteHash! == hash {
+            if websiteHash != nil && websiteHash! == hash && !forceUpdate {
                 accurate = true
                 return schedule!
             }
@@ -275,7 +283,7 @@ struct CurrentMapRotation {
                 hash = websiteHash!
             }
             else {
-                print("eroor updating hash")
+                print("error updating hash")
             }
             accurate = true
             return response!

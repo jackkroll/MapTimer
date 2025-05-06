@@ -92,8 +92,9 @@ struct ContentView: View {
                 if (new == .active) {
                     Task {
                         print("Updating data!")
-                        pubsSchedule = try await schedule.fetchPlaylist(playlist: .regular)
-                        rankedSchedule = try await schedule.fetchPlaylist(playlist: .ranked)
+                        let shouldUpdate =  await schedule.shouldUpdate()
+                        pubsSchedule = try await schedule.fetchPlaylist(playlist: .regular, forceUpdate: shouldUpdate)
+                        rankedSchedule = try await schedule.fetchPlaylist(playlist: .ranked, forceUpdate: shouldUpdate)
                         LTMSchedule = await schedule.fetchLTMS()
                     }
                 }
