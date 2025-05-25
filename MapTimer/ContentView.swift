@@ -103,78 +103,7 @@ struct ContentView: View {
     }
 }
 
-struct MapScheduleView: View {
-    @Environment(\.colorScheme) var colorScheme
-    @State var schedule : MapSchedule
-    @State var upcomingMaps : [Map] = []
-    @State var changeMap : Date? = nil
-    
-    var body : some View {
-        GeometryReader { geo in
-            VStack {
-                if (schedule.takeoverName != nil) {
-                    RoundedRectangle(cornerRadius: 10)
-                        .foregroundStyle(.background.secondary)
-                        .overlay{
-                            HStack{
-                                Image(systemName: "bolt.badge.clock.fill")
-                                Text(schedule.takeoverName ?? "Takeover Active")
-                            }
-                            .foregroundStyle(.primary)
-                            .fontWeight(.semibold)
-                        }
-                        .frame(width: geo.size.width * 0.75, height: 30)
-                }
-                ForEach(upcomingMaps, id: \.availableTo) { map in
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(map.mapColorTX().gradient)
-                        .overlay{
-                            ZStack{
-                                MapCard(map: map)
-                                if !(map.isAvailable(at: .now)) {
-                                    NotificationBell(map: map)
-                                }
-                            }
-                            
-                        }
-                        .frame(height: map.isAvailable(at: .now) ? geo.size.height * 0.5 : nil)
-                        .padding(5)
-                }
-            }
-            .onAppear() {
-                upcomingMaps = schedule.upcomingMaps(at: .now, range: 0...(UIDevice.current.orientation.isLandscape ? 2 : schedule.rotation.count))
-                changeMap = upcomingMaps.first?.availableTo
-            }
-            
-            .onChange(of: changeMap) { old, new in
-                if changeMap != nil {
-                    DispatchQueue.main.asyncAfter(deadline:  .now() + Date.now.distance(to: changeMap!)) {
-                        upcomingMaps = schedule.upcomingMaps(at: .now, range: 0...(UIDevice.current.orientation.isLandscape ? 2 : schedule.rotation.count))
-                        changeMap = upcomingMaps.first?.availableTo
-                    }
-                }
-            }
-        }
-    }
-}
 
-struct MapCard : View {
-    @State var map : Map
-    @Environment(\.colorScheme) var colorScheme
-    var body: some View {
-        VStack{
-            Text(map.headerText())
-            map.timerText()
-        }
-        .padding()
-        .multilineTextAlignment(.center)
-        .foregroundStyle(colorScheme == .dark ? .black : .white)
-        .fontWeight(.semibold)
-        .font((map.availableAt...map.availableTo).contains(.now) ? .largeTitle : .title2)
-        .fontDesign(map.fontStyle())
-        
-    }
-}
 
 
 
