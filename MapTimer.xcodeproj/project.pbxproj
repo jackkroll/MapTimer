@@ -14,6 +14,10 @@
 		565CE2F62D7F670B00DDA473 /* QuickviewExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 565CE2E02D7F670A00DDA473 /* QuickviewExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		565CE3212D80F2B900DDA473 /* MapSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565CE31E2D80F2B900DDA473 /* MapSchedule.swift */; };
 		565CE3392D80F50900DDA473 /* MapSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565CE31E2D80F2B900DDA473 /* MapSchedule.swift */; };
+		5686BF772DE3CF0E003C3392 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565CE2E22D7F670A00DDA473 /* WidgetKit.framework */; };
+		5686BF782DE3CF0E003C3392 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565CE2E42D7F670A00DDA473 /* SwiftUI.framework */; };
+		5686BF832DE3CF0F003C3392 /* QuickViewWatchExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5686BF762DE3CF0E003C3392 /* QuickViewWatchExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5686BF892DE3D96E003C3392 /* MapSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565CE31E2D80F2B900DDA473 /* MapSchedule.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +63,13 @@
 			remoteGlobalIDString = 565CE2DF2D7F670A00DDA473;
 			remoteInfo = QuickviewExtension;
 		};
+		5686BF812DE3CF0F003C3392 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 563207112D7D2A2F000AD31A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5686BF752DE3CF0E003C3392;
+			remoteInfo = QuickViewWatchExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -84,6 +95,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5686BF882DE3CF0F003C3392 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5686BF832DE3CF0F003C3392 /* QuickViewWatchExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -97,6 +119,7 @@
 		565CE2E22D7F670A00DDA473 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		565CE2E42D7F670A00DDA473 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		565CE31E2D80F2B900DDA473 /* MapSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSchedule.swift; sourceTree = "<group>"; };
+		5686BF762DE3CF0E003C3392 /* QuickViewWatchExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QuickViewWatchExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -113,6 +136,13 @@
 				HelperViews/NotificationViews.swift,
 			);
 			target = 565CE2DF2D7F670A00DDA473 /* QuickviewExtension */;
+		};
+		5686BF842DE3CF0F003C3392 /* Exceptions for "QuickViewWatch" folder in "QuickViewWatchExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5686BF752DE3CF0E003C3392 /* QuickViewWatchExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -156,6 +186,14 @@
 				565CE2F72D7F670B00DDA473 /* Exceptions for "Quickview" folder in "QuickviewExtension" target */,
 			);
 			path = Quickview;
+			sourceTree = "<group>";
+		};
+		5686BF792DE3CF0E003C3392 /* QuickViewWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5686BF842DE3CF0F003C3392 /* Exceptions for "QuickViewWatch" folder in "QuickViewWatchExtension" target */,
+			);
+			path = QuickViewWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -212,6 +250,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5686BF732DE3CF0E003C3392 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5686BF782DE3CF0E003C3392 /* SwiftUI.framework in Frameworks */,
+				5686BF772DE3CF0E003C3392 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -225,6 +272,7 @@
 				562B06062DE2985400916BB1 /* WatchMapTimer Watch App */,
 				562B06142DE2985500916BB1 /* WatchMapTimer Watch AppTests */,
 				562B061E2DE2985500916BB1 /* WatchMapTimer Watch AppUITests */,
+				5686BF792DE3CF0E003C3392 /* QuickViewWatch */,
 				565CE2E12D7F670A00DDA473 /* Frameworks */,
 				5632071A2D7D2A2F000AD31A /* Products */,
 				565CE31E2D80F2B900DDA473 /* MapSchedule.swift */,
@@ -241,6 +289,7 @@
 				562B06052DE2985400916BB1 /* WatchMapTimer Watch App.app */,
 				562B06112DE2985500916BB1 /* WatchMapTimer Watch AppTests.xctest */,
 				562B061B2DE2985500916BB1 /* WatchMapTimer Watch AppUITests.xctest */,
+				5686BF762DE3CF0E003C3392 /* QuickViewWatchExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -264,10 +313,12 @@
 				562B06012DE2985400916BB1 /* Sources */,
 				562B06022DE2985400916BB1 /* Frameworks */,
 				562B06032DE2985400916BB1 /* Resources */,
+				5686BF882DE3CF0F003C3392 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5686BF822DE3CF0F003C3392 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				562B06062DE2985400916BB1 /* WatchMapTimer Watch App */,
@@ -419,6 +470,28 @@
 			productReference = 565CE2E02D7F670A00DDA473 /* QuickviewExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		5686BF752DE3CF0E003C3392 /* QuickViewWatchExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5686BF852DE3CF0F003C3392 /* Build configuration list for PBXNativeTarget "QuickViewWatchExtension" */;
+			buildPhases = (
+				5686BF722DE3CF0E003C3392 /* Sources */,
+				5686BF732DE3CF0E003C3392 /* Frameworks */,
+				5686BF742DE3CF0E003C3392 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5686BF792DE3CF0E003C3392 /* QuickViewWatch */,
+			);
+			name = QuickViewWatchExtension;
+			packageProductDependencies = (
+			);
+			productName = QuickViewWatchExtension;
+			productReference = 5686BF762DE3CF0E003C3392 /* QuickViewWatchExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -454,6 +527,9 @@
 					565CE2DF2D7F670A00DDA473 = {
 						CreatedOnToolsVersion = 16.2;
 					};
+					5686BF752DE3CF0E003C3392 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 				};
 			};
 			buildConfigurationList = 563207142D7D2A2F000AD31A /* Build configuration list for PBXProject "MapTimer" */;
@@ -479,6 +555,7 @@
 				562B06042DE2985400916BB1 /* WatchMapTimer Watch App */,
 				562B06102DE2985500916BB1 /* WatchMapTimer Watch AppTests */,
 				562B061A2DE2985500916BB1 /* WatchMapTimer Watch AppUITests */,
+				5686BF752DE3CF0E003C3392 /* QuickViewWatchExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -527,6 +604,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		565CE2DE2D7F670A00DDA473 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5686BF742DE3CF0E003C3392 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -588,6 +672,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5686BF722DE3CF0E003C3392 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5686BF892DE3D96E003C3392 /* MapSchedule.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -621,6 +713,11 @@
 			target = 565CE2DF2D7F670A00DDA473 /* QuickviewExtension */;
 			targetProxy = 565CE2F42D7F670B00DDA473 /* PBXContainerItemProxy */;
 		};
+		5686BF822DE3CF0F003C3392 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5686BF752DE3CF0E003C3392 /* QuickViewWatchExtension */;
+			targetProxy = 5686BF812DE3CF0F003C3392 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -633,7 +730,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = WatchMapTimer;
+				INFOPLIST_KEY_CFBundleDisplayName = "Map Timer";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = JackKroll.MapTimer;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
@@ -662,7 +759,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = WatchMapTimer;
+				INFOPLIST_KEY_CFBundleDisplayName = "Map Timer";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = JackKroll.MapTimer;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
@@ -1018,7 +1115,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Quickview/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Quickview;
+				INFOPLIST_KEY_CFBundleDisplayName = "Map Timer";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1044,7 +1141,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Quickview/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Quickview;
+				INFOPLIST_KEY_CFBundleDisplayName = "Map Timer";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1058,6 +1155,64 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5686BF862DE3CF0F003C3392 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = QuickViewWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Map Timer";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = JackKroll.MapTimer.watchkitapp.QuickViewWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Debug;
+		};
+		5686BF872DE3CF0F003C3392 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = QuickViewWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Map Timer";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = JackKroll.MapTimer.watchkitapp.QuickViewWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
 			};
 			name = Release;
 		};
@@ -1132,6 +1287,15 @@
 			buildConfigurations = (
 				565CE2F92D7F670B00DDA473 /* Debug */,
 				565CE2FA2D7F670B00DDA473 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5686BF852DE3CF0F003C3392 /* Build configuration list for PBXNativeTarget "QuickViewWatchExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5686BF862DE3CF0F003C3392 /* Debug */,
+				5686BF872DE3CF0F003C3392 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

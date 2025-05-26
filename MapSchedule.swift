@@ -93,6 +93,10 @@ struct Map : Codable {
         }
     }
     
+    func monogram() -> String {
+        return name.rawValue.uppercased()
+    }
+    
     func mapColorBG() -> Color {
         switch(name) {
         case .KC: return .clear
