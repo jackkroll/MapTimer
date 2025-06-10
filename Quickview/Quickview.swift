@@ -70,26 +70,44 @@ struct SimpleEntry: TimelineEntry {
 
 struct Futureview_Small : View {
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.widgetRenderingMode) var renderingMode
     var entry: Provider.Entry
     
     var body: some View {
         VStack{
             ForEach(entry.schedule, id: \.availableAt){ map in
-                RoundedRectangle(cornerRadius: 15)
-                    .foregroundStyle(map.mapColorTX().gradient)
-                    .overlay {
-                        VStack {
-                            Text(map.mapName())
+                if renderingMode == .accented {
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(lineWidth: 3)
+                        .overlay {
+                            VStack {
+                                Text(map.mapName())
+                            }
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(colorScheme == .light ? .white : .black)
+                            .fontWeight(.semibold)
+                            .fontDesign(map.fontStyle())
                         }
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(colorScheme == .light ? .white : .black)
-                        .fontWeight(.semibold)
-                        .fontDesign(map.fontStyle())
-                    }
+                        .tint(map.mapColorTX())
+                }
+                else {
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundStyle(map.mapColorTX().gradient)
+                        .overlay {
+                            VStack {
+                                Text(map.mapName())
+                            }
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(colorScheme == .light ? .white : .black)
+                            .fontWeight(.semibold)
+                            .fontDesign(map.fontStyle())
+                        }
+                }
             }
         }
     }
 }
+
 
 struct Quickview_Large : View {
     var entry: Provider.Entry
